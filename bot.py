@@ -89,7 +89,9 @@ async def update_server_roles(userid):
     elif rank == 'Legend':
         rank = roles[5]
     elif rank == 'Dominator':
-        await update_server_roles(roles[6].members[0].id)
+        try:
+            await update_server_roles(roles[6].members[0].id)
+        except: pass
         rank = roles[6]
     await user.remove_roles(roles[0], roles[1], roles[2], roles[3], roles[4], roles[5], roles[6])
     await user.add_roles(rank)
