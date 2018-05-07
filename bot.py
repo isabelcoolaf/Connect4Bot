@@ -622,7 +622,7 @@ async def info(ctx):
 async def invite(ctx):
     if check_blacklist(ctx.author.id):
         return
-    embed = discord.Embed(color=0x3498db, description='**Thanks for your interest in Connect 4 Bot!\n[C4 Bot Link](https://discordapp.com/oauth2/authorize?client_id=442185653992816640&permissions=288832&redirect_uri=https%3A%2F%2Fwilliamlomas.me%2Fthanks&scope=bot)\n[Support Server Invite](https://discord.gg/wzWpsfU)')
+    embed = discord.Embed(color=0x3498db, description='**Thanks for your interest in Connect 4 Bot!**\n[C4 Bot Link](https://discordapp.com/oauth2/authorize?client_id=442185653992816640&permissions=288832&redirect_uri=https%3A%2F%2Fwilliamlomas.me%2Fthanks&scope=bot)\n[Support Server Invite](https://discord.gg/wzWpsfU)')
     await ctx.send(embed=embed)
 
 @client.command()
