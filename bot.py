@@ -218,9 +218,11 @@ class Connect4Session:
         self.grid = Grid(self)
         sessions.append(self)
 
-    def save_data(self, winner):
+    def save_data(self, winner=None):
         global activegames
-        data = {"player1": self.player1.id, "player2": self.player2.id, "winner": winner.id, "channel": self.channel.id, "timestamp": str(self.timestamp), "grid": {"a1": self.grid.a1, "a2": self.grid.a2, "a3": self.grid.a3, "a4": self.grid.a4, "a5": self.grid.a5, "a6": self.grid.a6, "b1": self.grid.b1, "b2": self.grid.b2, "b3": self.grid.b3, "b4": self.grid.b4, "b5": self.grid.b5, "b6": self.grid.b6, "c1": self.grid.c1, "c2": self.grid.c2, "c3": self.grid.c3, "c4": self.grid.c4, "c5": self.grid.c5, "c6": self.grid.c6, "d1": self.grid.d1, "d2": self.grid.d2, "d3": self.grid.d3, "d4": self.grid.d4, "d5": self.grid.d5, "d6": self.grid.d6, "e1": self.grid.e1, "e2": self.grid.e2, "e3": self.grid.e3, "e4": self.grid.e4, "e5": self.grid.e5, "e6": self.grid.e6, "f1": self.grid.f1, "f2": self.grid.f2, "f3": self.grid.f3, "f4": self.grid.f4, "f5": self.grid.f5, "f6": self.grid.f6, "g1": self.grid.g1, "g2": self.grid.g2, "g3": self.grid.g3, "g4": self.grid.g4, "g5": self.grid.g5, "g6": self.grid.g6}}
+        if winner is not None:
+            winner = winner.id
+        data = {"player1": self.player1.id, "player2": self.player2.id, "winner": winner, "channel": self.channel.id, "timestamp": str(self.timestamp), "grid": {"a1": self.grid.a1, "a2": self.grid.a2, "a3": self.grid.a3, "a4": self.grid.a4, "a5": self.grid.a5, "a6": self.grid.a6, "b1": self.grid.b1, "b2": self.grid.b2, "b3": self.grid.b3, "b4": self.grid.b4, "b5": self.grid.b5, "b6": self.grid.b6, "c1": self.grid.c1, "c2": self.grid.c2, "c3": self.grid.c3, "c4": self.grid.c4, "c5": self.grid.c5, "c6": self.grid.c6, "d1": self.grid.d1, "d2": self.grid.d2, "d3": self.grid.d3, "d4": self.grid.d4, "d5": self.grid.d5, "d6": self.grid.d6, "e1": self.grid.e1, "e2": self.grid.e2, "e3": self.grid.e3, "e4": self.grid.e4, "e5": self.grid.e5, "e6": self.grid.e6, "f1": self.grid.f1, "f2": self.grid.f2, "f3": self.grid.f3, "f4": self.grid.f4, "f5": self.grid.f5, "f6": self.grid.f6, "g1": self.grid.g1, "g2": self.grid.g2, "g3": self.grid.g3, "g4": self.grid.g4, "g5": self.grid.g5, "g6": self.grid.g6}}
         fp = open('data/games.data', 'r+')
         content = json.load(fp)
         content[str(self.gameid)] = data
