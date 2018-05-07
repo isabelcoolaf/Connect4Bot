@@ -733,7 +733,7 @@ async def shutdown(ctx, mode, force=False):
         await client.logout()
         
     elif mode == '-u':
-        message = await ctx.send('{}, updating Blade... :cd:'.format(user.mention))
+        message = await ctx.send('{}, updating... :cd:'.format(user.mention))
         os.system('git pull')
         await message.edit(content='{}, successfully updated! :white_check_mark:'.format(user.mention))
         os.system('bot.py')
