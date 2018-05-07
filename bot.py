@@ -588,6 +588,7 @@ async def help(ctx):
     embed = discord.Embed(color=0x3498db, title='Connect 4 Bot Help', description='The command list')
     embed.add_field(name='c4-help', value='View this menu.', inline=False)
     embed.add_field(name='c4-info', value='View info about Connect 4 Bot.', inline=False)
+    embed.add_field(name='c4-invite', value='Invite Connect 4 Bot.', inline=False)
     embed.add_field(name='c4-ranks', value='View the list of ranks.', inline=False)
     embed.add_field(name='c4-terms', value='View the Connect 4 Bot Terms.', inline=False)
     embed.add_field(name='c4-report', value='Report a user for breaking a rule.', inline=False)
@@ -616,6 +617,13 @@ async def info(ctx):
         await ctx.send(embed=embed)
     except:
         return await ctx.send('{}, I do not have permission to send this command output. :no_entry:'.format(ctx.author.mention))
+
+@client.command()
+async def invite(ctx):
+    if check_blacklist(ctx.author.id):
+        return
+    embed = discord.Embed(color=0x3498db, description='**Thanks for your interest in Connect 4 Bot!\n[C4 Bot Link](https://discordapp.com/oauth2/authorize?client_id=442185653992816640&permissions=288832&redirect_uri=https%3A%2F%2Fwilliamlomas.me%2Fthanks&scope=bot)\n[Support Server Invite](https://discord.gg/wzWpsfU)')
+    await ctx.send(embed=embed)
 
 @client.command()
 async def ranks(ctx):
