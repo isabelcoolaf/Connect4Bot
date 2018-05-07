@@ -1,2 +1,5 @@
 # Connect4Bot
-A new Discord Bot coming soon...
+
+The best Discord Connect 4 Experience!
+
+[Try today!](https://discordbots.org/bot/442185653992816640)
