@@ -967,8 +967,10 @@ async def game(ctx, gameid=None, gridmode=None):
     channel = client.get_channel(game['channel'])
     if channel is None:
         channelname = 'deleted-channel'
+        guild = '(Connect 4 Bot Cannot See This Guild Anymore)'
     else:
         channelname = channel.name
+        guild = channel.guild.name
     if winner.id == game['player1']:
         winner = str(winner) + ' (:red_circle:)'
         loser = await client.get_user_info(game['player2'])
@@ -982,7 +984,7 @@ async def game(ctx, gameid=None, gridmode=None):
     embed.add_field(name='Winner', value=winner)
     embed.add_field(name='Loser', value=loser)
     embed.add_field(name='Channel', value='#' + channelname)
-    embed.add_field(name='Server', value=channel.guild.name)
+    embed.add_field(name='Server', value=guild)
     embed.add_field(name='Grid', value='Run the command `c4-game {} grid` to view this game\'s grid.'.format(gameid))
     await ctx.send(embed=embed)
 
