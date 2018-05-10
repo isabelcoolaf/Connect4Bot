@@ -965,6 +965,10 @@ async def game(ctx, gameid=None, gridmode=None):
     winner = game['winner']
     winner = await client.get_user_info(winner)
     channel = client.get_channel(game['channel'])
+    if channel is None:
+        channelname = 'deleted-channel'
+    else:
+        channelname = channel.name
     if winner.id == game['player1']:
         winner = str(winner) + ' (:red_circle:)'
         loser = await client.get_user_info(game['player2'])
@@ -977,7 +981,7 @@ async def game(ctx, gameid=None, gridmode=None):
     embed.timestamp = timestamp
     embed.add_field(name='Winner', value=winner)
     embed.add_field(name='Loser', value=loser)
-    embed.add_field(name='Channel', value='#' + channel.name)
+    embed.add_field(name='Channel', value='#' + channelname)
     embed.add_field(name='Server', value=channel.guild.name)
     embed.add_field(name='Grid', value='Run the command `c4-game {} grid` to view this game\'s grid.'.format(gameid))
     await ctx.send(embed=embed)
