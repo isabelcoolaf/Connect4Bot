@@ -522,9 +522,8 @@ class Connect4Session:
         try:
             embed = self.grid.message.embeds[0]
             embed.set_footer(text=embed.Empty)
-        except:
-            pass
-        await self.grid.message.edit(embed=embed)
+            await self.grid.message.edit(embed=embed)
+        except: pass
         embed = discord.Embed(color=0x00bdff, title='Connect 4', description='Match ending...')
         if winner is None:
             winner = None
