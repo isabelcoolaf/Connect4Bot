@@ -125,10 +125,10 @@ def check_blacklist(user):
     fp = open('data/blacklist.data')
     content = json.load(fp)
     try:
-        if content[str(userid)] == 1 or user.bot:
+        if user.bot or content[str(userid)] == 1:
             return True
         return False
-    except:
+    except KeyError:
         return False
 
 async def status_rotation():
