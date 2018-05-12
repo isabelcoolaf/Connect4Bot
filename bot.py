@@ -610,7 +610,6 @@ async def help(ctx):
     embed.add_field(name='c4-info', value='View info about Connect 4 Bot.', inline=False)
     embed.add_field(name='c4-invite', value='Invite Connect 4 Bot.', inline=False)
     embed.add_field(name='c4-ranks', value='View the list of ranks.', inline=False)
-    embed.add_field(name='c4-terms', value='View the Connect 4 Bot Terms.', inline=False)
     embed.add_field(name='c4-report', value='Report a user for breaking a rule.', inline=False)
     embed.add_field(name='c4-play', value='Request for a game of Connect 4.', inline=False)
     embed.add_field(name='c4-view', value='Reload the grid.', inline=False)
