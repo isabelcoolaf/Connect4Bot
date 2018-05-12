@@ -60,15 +60,6 @@ def get_leaderboard():
         users.append(user) 
     return users
 
-def check_terms_accepted(userid):
-    fp = open('data/terms-consent.data')
-    content = json.load(fp)
-    try:
-        if content[str(userid)]['consent'] == 1:
-            return True
-        return False
-    except: return False
-
 def get_rank(userid):
     try:
         if str(userid) == get_leaderboard()[0]:
@@ -692,42 +683,6 @@ async def ranks(ctx):
     await ctx.send(embed=embed)
 
 @client.command()
-async def terms(ctx):
-    user = ctx.author
-    def check(reaction, useri):
-        return user.id == useri.id and reaction.message.id == message.id
-    if check_blacklist(user):
-        return
-    embed = discord.Embed(color=0x3498db, title='Connect 4 Bot Usage Agreement', description='Last Updated 6/5/18')
-    embed.add_field(name='1. Do not manipulate stats', value='Don\'t use an alt to gain fake stats, basically.', inline=False)
-    embed.add_field(name='2. Do not exploit glitches', value='The title says it all.', inline=False)
-    embed.add_field(name='3. We get to save data', value='By using this bot, you agree to having your stats recorded, and stored.', inline=False)
-    embed.add_field(name='4. You are expected to report rulebreakers', value='If you see anyone breaking any of these rules, you are expected to report them through `c4-report`.', inline=False)
-    embed.add_field(name='5. We can still blacklist you anyway', value='We get to blacklist you for any reason.', inline=False)
-    fp = open('data/terms-consent.data', 'r+')
-    content = json.load(fp)
-    try:
-        if content[str(user.id)]['consent'] == 1:
-            embed.set_footer(text='You agreed to these terms {}.'.format(content[str(user.id)]['timestamp']))
-            await ctx.send(embed=embed)
-    except:
-        await ctx.send(embed=embed)
-        message = await ctx.send('{}, if you wish to agree to these terms. React with :handshake:'.format(user.mention))
-        await message.add_reaction("🤝")
-        try:
-            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-        except:
-            await message.delete()
-            await ctx.send('{}, I guess not then...'.format(user.mention))
-        else:
-            await message.delete()
-            content[str(user.id)] = {"consent": 1, "timestamp": str(datetime.datetime.now())}
-            fp.seek(0)
-            json.dump(content, fp)
-            fp.truncate()
-            await ctx.send('Alright {}, it\'s official. :tada:'.format(user.mention))
-
-@client.command()
 async def blacklist(ctx, mode, userid):
     user = ctx.author
     if user.id != 169275259026014208:
@@ -808,8 +763,6 @@ async def report(ctx, user: discord.Member=None, *, reason=None):
     reporter = ctx.author
     if check_blacklist(reporter):
         return
-    if check_terms_accepted(reporter.id) is False:
-        return await ctx.send('{}, you must accept the Connect 4 bot service rules before using this feature.\nCheck `c4-terms`'.format(reporter.mention))
     if user is None or reason is None:
         embed = discord.Embed(color=0x3498db, description='Command Help', title='c4-report')
         embed.add_field(name='c4-report <user> <reason>', value='Report a rule-breaker.', inline=False)
@@ -844,8 +797,6 @@ async def play(ctx):
     author = ctx.author
     if check_blacklist(author):
         return
-    if check_terms_accepted(author.id) is False:
-        return await ctx.send('{}, you must accept the Connect 4 bot service rules before using this feature.\nCheck `c4-terms`'.format(author.mention))
     async def wait_player_two(session):
         def check(reaction, user):
             return str(reaction.emoji) == '🤝' and user != ctx.me and user != author and not already_playing(user) and not user.bot and reaction.message.id == message.id and not check_blacklist(user)
@@ -856,9 +807,6 @@ async def play(ctx):
             await ctx.send('{}, unfortunately, no one has joined your game. :no_entry:'.format(author.mention))
             await message.delete()
         else:
-            if check_terms_accepted(reaction[1].id) is False:
-                await ctx.send('{}, you must accept the Connect 4 bot service rules before using this feature.\nCheck `c4-terms`'.format(reaction[1].mention))
-                await wait_player_two(session)
             session.player2 = reaction[1]
             session.nonturnholder = session.player2
             await message.delete()
