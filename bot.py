@@ -120,11 +120,12 @@ async def update_server_roles(userid):
     await user.remove_roles(roles[0], roles[1], roles[2], roles[3], roles[4], roles[5], roles[6])
     await user.add_roles(rank)
 
-def check_blacklist(userid):
+def check_blacklist(user):
+    userid = user.id
     fp = open('data/blacklist.data')
     content = json.load(fp)
     try:
-        if content[str(userid)] == 1:
+        if content[str(userid)] == 1 or user.bot:
             return True
         return False
     except:
@@ -611,7 +612,7 @@ async def on_member_join(member):
 @client.command(aliases=['commands'])
 async def help(ctx):
     user = ctx.author
-    if check_blacklist(user.id):
+    if check_blacklist(user):
         return
     embed = discord.Embed(color=0x3498db, title='Connect 4 Bot Help', description='The command list')
     embed.add_field(name='c4-help', value='View this menu.', inline=False)
@@ -633,7 +634,7 @@ async def help(ctx):
 
 @client.command()
 async def info(ctx):
-    if check_blacklist(ctx.author.id):
+    if check_blacklist(ctx.author):
         return
     embed = discord.Embed(color=0x3498db)
     embed.add_field(name='What is Connect 4 Bot?', value='Connect 4 bot is a bot designed specifically for the gameplay of Connect 4, in Discord!')
@@ -648,7 +649,7 @@ async def info(ctx):
 
 @client.command()
 async def invite(ctx):
-    if check_blacklist(ctx.author.id):
+    if check_blacklist(ctx.author):
         return
     embed = discord.Embed(color=0x3498db, description='**Thanks for your interest in Connect 4 Bot!**\n[C4 Bot Link](https://discordapp.com/oauth2/authorize?client_id=442185653992816640&permissions=288832&redirect_uri=https%3A%2F%2Fwilliamlomas.me%2Fthanks&scope=bot)\n[Support Server Invite](https://discord.gg/wzWpsfU)')
     await ctx.send(embed=embed)
@@ -656,7 +657,7 @@ async def invite(ctx):
 @client.command()
 async def ranks(ctx):
     user = ctx.author
-    if check_blacklist(user.id):
+    if check_blacklist(user):
         return
     embed = discord.Embed(color=0x3498db, title='Ranks', description='The list of ranks you can get.')
     rank = get_rank(user.id)
@@ -695,7 +696,7 @@ async def terms(ctx):
     user = ctx.author
     def check(reaction, useri):
         return user.id == useri.id and reaction.message.id == message.id
-    if check_blacklist(user.id):
+    if check_blacklist(user):
         return
     embed = discord.Embed(color=0x3498db, title='Connect 4 Bot Usage Agreement', description='Last Updated 6/5/18')
     embed.add_field(name='1. Do not manipulate stats', value='Don\'t use an alt to gain fake stats, basically.', inline=False)
@@ -805,7 +806,7 @@ async def debug(ctx, *, code):
 @commands.cooldown(1, 20, commands.BucketType.user)
 async def report(ctx, user: discord.Member=None, *, reason=None):
     reporter = ctx.author
-    if check_blacklist(reporter.id):
+    if check_blacklist(reporter):
         return
     if check_terms_accepted(reporter.id) is False:
         return await ctx.send('{}, you must accept the Connect 4 bot service rules before using this feature.\nCheck `c4-terms`'.format(reporter.mention))
@@ -841,13 +842,13 @@ async def report(ctx, user: discord.Member=None, *, reason=None):
 @client.command(aliases=['start'])
 async def play(ctx):
     author = ctx.author
-    if check_blacklist(author.id):
+    if check_blacklist(author):
         return
     if check_terms_accepted(author.id) is False:
         return await ctx.send('{}, you must accept the Connect 4 bot service rules before using this feature.\nCheck `c4-terms`'.format(author.mention))
     async def wait_player_two(session):
         def check(reaction, user):
-            return str(reaction.emoji) == '🤝' and user != ctx.me and user != author and not already_playing(user) and not user.bot and reaction.message.id == message.id and not check_blacklist(user.id)
+            return str(reaction.emoji) == '🤝' and user != ctx.me and user != author and not already_playing(user) and not user.bot and reaction.message.id == message.id and not check_blacklist(user)
         try:
             reaction = await client.wait_for('reaction_add', timeout=30.0, check=check)
         except:
@@ -879,7 +880,7 @@ async def play(ctx):
 @client.command()
 async def quit(ctx):
     author = ctx.author
-    if check_blacklist(author.id):
+    if check_blacklist(author):
         return
     if not connect4_active(ctx):
         return await ctx.send('{}, there are no active games in this channel. :no_entry:'.format(author.mention))
@@ -895,7 +896,7 @@ async def quit(ctx):
 @client.command(aliases=['display'])
 async def view(ctx):
     author = ctx.author
-    if check_blacklist(author.id):
+    if check_blacklist(author):
         return
     if not connect4_active(ctx):
         return await ctx.send('{}, there are no active games in this channel. :no_entry:'.format(author.mention))
@@ -909,7 +910,7 @@ async def view(ctx):
 @client.command()
 async def stats(ctx, *, user: discord.Member=None):
     author = ctx.author
-    if check_blacklist(author.id):
+    if check_blacklist(author):
         return
     if not user:
         user = author
@@ -941,7 +942,7 @@ async def stats(ctx, *, user: discord.Member=None):
 @client.command()
 async def game(ctx, gameid=None, gridmode=None):
     user = ctx.author
-    if check_blacklist(user.id):
+    if check_blacklist(user):
         return
     if gameid is None:
         return await ctx.send('{}, please specify a game ID. :no_entry:'.format(user.mention))
