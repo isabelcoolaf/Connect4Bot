@@ -132,9 +132,9 @@ def check_blacklist(userid):
 
 async def status_rotation():
     while True:
-        await client.change_presence(activity=discord.Activity(name="your moves 👀 | c4-help", type=discord.ActivityType.watching))
-        await asyncio.sleep(30)
         await client.change_presence(activity=discord.Game(name="Connect 4 | c4-help"))
+        await asyncio.sleep(30)
+        await client.change_presence(activity=discord.Activity(name="your moves 👀 | c4-help", type=discord.ActivityType.watching))
         await asyncio.sleep(30)
 
 def count_active_games():
