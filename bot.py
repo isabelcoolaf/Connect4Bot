@@ -901,8 +901,12 @@ async def game(ctx, gameid=None, gridmode=None):
     if gridmode == 'grid':
         async with ctx.typing():
             pass
-        player1 = await client.get_user_info(game['player1'])
-        player2 = await client.get_user_info(game['player2'])
+        player1 = client.get_user(game['player1'])
+        player2 = client.get_user(game['player2'])
+        if player1 is None:
+            player1 = await client.get_user_info(game['player1'])
+        if player2 is None:
+            player2 = await client.get_user_info(game['player2'])
         embed = discord.Embed(color=0x3498db, title='Game No. {} - Grid'.format(gameid), description=':red_circle: = {}\n:large_blue_circle: = {}'.format(player1, player2))
         embed.add_field(name=":regional_indicator_a:​:regional_indicator_b:​:regional_indicator_c:​:regional_indicator_d:​:regional_indicator_e:​:regional_indicator_f:​:regional_indicator_g:", value="{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}".format(game['grid']['a1'], game['grid']['b1'], game['grid']['c1'], game['grid']['d1'], game['grid']['e1'], game['grid']['f1'], game['grid']['g1'], game['grid']['a2'], game['grid']['b2'], game['grid']['c2'], game['grid']['d2'], game['grid']['e2'], game['grid']['f2'], game['grid']['g2'], game['grid']['a3'], game['grid']['b3'], game['grid']['c3'], game['grid']['d3'], game['grid']['e3'], game['grid']['f3'], game['grid']['g3'], game['grid']['a4'], game['grid']['b4'], game['grid']['c4'], game['grid']['d4'], game['grid']['e4'], game['grid']['f4'], game['grid']['g4'], game['grid']['a5'], game['grid']['b5'], game['grid']['c5'], game['grid']['d5'], game['grid']['e5'], game['grid']['f5'], game['grid']['g5'], game['grid']['a6'], game['grid']['b6'], game['grid']['c6'], game['grid']['d6'], game['grid']['e6'], game['grid']['f6'], game['grid']['g6']), inline=False)
         return await ctx.send(embed=embed)
