@@ -92,18 +92,46 @@ async def update_server_roles(userid):
     roles = [discord.utils.get(server.roles, id=442626469597020192), discord.utils.get(server.roles, id=442626468154048514), discord.utils.get(server.roles, id=442626465767489537), discord.utils.get(server.roles, id=442626463380799488), discord.utils.get(server.roles, id=442626453931032577), discord.utils.get(server.roles, id=442626446742257675), discord.utils.get(server.roles, id=442626725604753408)]
     rank = get_rank(userid)
     if rank == 'Learner':
+        for user in roles[0].members:
+            if user.id == userid:
+                return
+            else: pass
         rank = roles[0]
     elif rank == 'Average':
+        for user in roles[1].members:
+            if user.id == userid:
+                return
+            else: pass
         rank = roles[1]
     elif rank == 'Pro':
+        for user in roles[2].members:
+            if user.id == userid:
+                return
+            else: pass
         rank = roles[2]
     elif rank == 'Master':
+        for user in roles[3].members:
+            if user.id == userid:
+                return
+            else: pass
         rank = roles[3]
     elif rank == 'God':
+        for user in roles[4].members:
+            if user.id == userid:
+                return
+            else: pass
         rank = roles[4]
     elif rank == 'Legend':
+        for user in roles[5].members:
+            if user.id == userid:
+                return
+            else: pass
         rank = roles[5]
     elif rank == 'Dominator':
+        for user in roles[6].members:
+            if user.id == userid:
+                return
+            else: pass
         try:
             await update_server_roles(roles[6].members[0].id)
         except: pass
