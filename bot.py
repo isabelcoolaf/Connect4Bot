@@ -958,7 +958,7 @@ async def game(ctx, gameid=None, gridmode=None):
             loser = await client.get_user_info(game['player1'])
         loser = str(loser) + ' (:red_circle:)'
     if channel is None:
-        channelname = '#deleted-channel'
+        channelname = 'deleted-channel'
         guild = 'Unknown Guild'
     else:
         channelname = channel.name
