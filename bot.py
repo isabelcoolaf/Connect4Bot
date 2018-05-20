@@ -941,23 +941,28 @@ async def game(ctx, gameid=None, gridmode=None):
     embed = discord.Embed(color=0x3498db, title='Game No. {}'.format(gameid))
     async with ctx.typing():
         pass
-    winner = game['winner']
-    winner = await client.get_user_info(winner)
+    winner = client.get_user(game['winner'])
+    if winner is None:
+        winner = await client.get_user_info(game['winner'])
     channel = client.get_channel(game['channel'])
-    if channel is None:
-        channelname = 'deleted-channel'
-        guild = '(Connect 4 Bot Cannot See This Guild Anymore)'
-    else:
-        channelname = channel.name
-        guild = channel.guild.name
     if winner.id == game['player1']:
         winner = str(winner) + ' (:red_circle:)'
-        loser = await client.get_user_info(game['player2'])
+        loser = client.get_user(game['player2'])
+        if loser is None:
+            loser = await client.get_user_info(game['player2'])
         loser = str(loser) + ' (:large_blue_circle:)'
     else:
         winner = str(winner) + ' (:large_blue_circle:)'
-        loser = await client.get_user_info(game['player1'])
+        loser = client.get_user(game['player1'])
+        if loser is None:
+            loser = await client.get_user_info(game['player1'])
         loser = str(loser) + ' (:red_circle:)'
+    if channel is None:
+        channelname = '#deleted-channel'
+        guild = 'Unknown Guild'
+    else:
+        channelname = channel.name
+        guild = channel.guild.name
     timestamp = datetime.datetime.strptime(game['timestamp'], '%Y-%m-%d %H:%M:%S.%f')
     embed.timestamp = timestamp
     embed.add_field(name='Winner', value=winner)
