@@ -22,13 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import discord
-from discord.ext import commands
-import json
 import asyncio
-import async_timeout
+import json
 import os
 import datetime
+import discord
+from discord.ext import commands
 from utils.chat_formatting import pagify, box
 
 prefixes = ['<@442185653992816640> ', '<@!442185653992816640> ', 'c4-', 'C4-']
@@ -57,7 +56,7 @@ def get_leaderboard():
     sortedpoints = reversed(sorted(pointsdict, key=pointsdict.get))
     users = []
     for user in sortedpoints:
-        users.append(user) 
+        users.append(user)
     return users
 
 def get_rank(userid):
@@ -72,17 +71,17 @@ def get_rank(userid):
         points = ((wins*10)+(losses*-5)+(draws*3))
         if (points / rankslist['Legend']) >= 1:
             return 'Legend'
-        elif (points / rankslist['God']) >= 1:
+        if (points / rankslist['God']) >= 1:
             return 'God'
-        elif (points / rankslist['Master']) >= 1:
+        if (points / rankslist['Master']) >= 1:
             return 'Master'
-        elif (points / rankslist['Pro']) >= 1:
+        if (points / rankslist['Pro']) >= 1:
             return 'Pro'
-        elif (points / rankslist['Average']) >= 1:
+        if (points / rankslist['Average']) >= 1:
             return 'Average'
-        else:
-            return 'Learner'
-    except: return 'Learner'
+        return 'Learner'
+    except KeyError:
+        return 'Learner'
 
 async def update_server_roles(userid):
     server = client.get_guild(442186373089198080)
@@ -95,46 +94,37 @@ async def update_server_roles(userid):
         for useri in roles[0].members:
             if useri.id == userid:
                 return
-            else: pass
         rank = roles[0]
     elif rank == 'Average':
         for useri in roles[1].members:
             if useri.id == userid:
                 return
-            else: pass
         rank = roles[1]
     elif rank == 'Pro':
         for useri in roles[2].members:
             if useri.id == userid:
                 return
-            else: pass
         rank = roles[2]
     elif rank == 'Master':
         for useri in roles[3].members:
             if useri.id == userid:
                 return
-            else: pass
         rank = roles[3]
     elif rank == 'God':
         for useri in roles[4].members:
             if useri.id == userid:
                 return
-            else: pass
         rank = roles[4]
     elif rank == 'Legend':
         for useri in roles[5].members:
             if useri.id == userid:
                 return
-            else: pass
         rank = roles[5]
     elif rank == 'Dominator':
         for useri in roles[6].members:
             if useri.id == userid:
                 return
-            else: pass
-        try:
-            await update_server_roles(roles[6].members[0].id)
-        except: pass
+        await update_server_roles(roles[6].members[0].id)
         rank = roles[6]
     await user.remove_roles(roles[0], roles[1], roles[2], roles[3], roles[4], roles[5], roles[6])
     await user.add_roles(rank)
@@ -232,8 +222,8 @@ class Grid:
     async def display(self, mode=None):
         if self.message is not None:
             try:
-                await self.message.delete() # There's a possibility of the old message being deleted, this tryexcept fixes that.
-            except: pass
+                await self.message.delete()
+            except discord.NotFound: pass
         letters = ['\U0001f1e6', '\U0001f1e7', '\U0001f1e8', '\U0001f1e9', '\U0001f1ea', '\U0001f1eb', '\U0001f1ec']
         embed = discord.Embed(color=0x00bdff, description=':red_circle: = {}\n:large_blue_circle: = {}'.format(self.session.player1, self.session.player2))
         embed.title = "Grid"
@@ -247,9 +237,7 @@ class Grid:
             for letter in letters:
                 await self.message.add_reaction(letter)
             await self.session.move()
-        except Exception as e:
-            await self.session.channel.send(e)
-            await self.session.channel.send('I need the Embed Links, and Add Reactions permission to show the grid. :no_entry:')
+        except discord.HTTPException: pass
 
 class Connect4Session:
     def __init__(self, channel, p1, p2=None):
@@ -281,12 +269,11 @@ class Connect4Session:
         '''Sorry, mom'''
         if self.grid.a6 == self.grid.b6 == self.grid.c6 == self.grid.d6 != ":black_circle:" or self.grid.b6 == self.grid.c6 == self.grid.d6 == self.grid.e6 != ":black_circle:" or self.grid.c6 == self.grid.d6 == self.grid.e6 == self.grid.f6 != ":black_circle:" or self.grid.d6 == self.grid.e6 == self.grid.f6 == self.grid.g6 != ":black_circle:" or self.grid.a5 == self.grid.b5 == self.grid.c5 == self.grid.d5 != ":black_circle:" or self.grid.b5 == self.grid.c5 == self.grid.d5 == self.grid.e5 != ":black_circle:" or self.grid.c5 == self.grid.d5 == self.grid.e5 == self.grid.f5 != ":black_circle:" or self.grid.d5 == self.grid.e5 == self.grid.f5 == self.grid.g5 != ":black_circle:" or self.grid.a4 == self.grid.b4 == self.grid.c4 == self.grid.d4 != ":black_circle:" or self.grid.b4 == self.grid.c4 == self.grid.d4 == self.grid.e4 != ":black_circle:" or self.grid.c4 == self.grid.d4 == self.grid.e4 == self.grid.f4 != ":black_circle:" or self.grid.d4 == self.grid.e4 == self.grid.f4 == self.grid.g4 != ":black_circle:" or self.grid.a3 == self.grid.b3 == self.grid.c3 == self.grid.d3 != ":black_circle:" or self.grid.b3 == self.grid.c3 == self.grid.d3 == self.grid.e3 != ":black_circle:" or self.grid.c3 == self.grid.d3 == self.grid.e3 == self.grid.f3 != ":black_circle:" or self.grid.d3 == self.grid.e3 == self.grid.f3 == self.grid.g3 != ":black_circle:" or self.grid.a2 == self.grid.b2 == self.grid.c2 == self.grid.d2 != ":black_circle:" or self.grid.b2 == self.grid.c2 == self.grid.d2 == self.grid.e2 != ":black_circle:" or self.grid.c2 == self.grid.d2 == self.grid.e2 == self.grid.f2 != ":black_circle:" or self.grid.d2 == self.grid.e2 == self.grid.f2 == self.grid.g2 != ":black_circle:" or self.grid.a1 == self.grid.b1 == self.grid.c1 == self.grid.d1 != ":black_circle:" or self.grid.b1 == self.grid.c1 == self.grid.d1 == self.grid.e1 != ":black_circle:" or self.grid.c1 == self.grid.d1 == self.grid.e1 == self.grid.f1 != ":black_circle:" or self.grid.d1 == self.grid.e1 == self.grid.f1 == self.grid.g1 != ":black_circle:":
             return True
-        elif self.grid.a6 == self.grid.a5 == self.grid.a4 == self.grid.a3 != ":black_circle:" or self.grid.a5 == self.grid.a4 == self.grid.a3 == self.grid.a2 != ":black_circle:" or self.grid.a4 == self.grid.a3 == self.grid.a2 == self.grid.a1 != ":black_circle:" or self.grid.b6 == self.grid.b5 == self.grid.b4 == self.grid.b3 != ":black_circle:" or self.grid.b5 == self.grid.b4 == self.grid.b3 == self.grid.b2 != ":black_circle:" or self.grid.b4 == self.grid.b3 == self.grid.b2 == self.grid.b1 != ":black_circle:" or self.grid.c6 == self.grid.c5 == self.grid.c4 == self.grid.c3 != ":black_circle:" or self.grid.c5 == self.grid.c4 == self.grid.c3 == self.grid.c2 != ":black_circle:" or self.grid.c4 == self.grid.c3 == self.grid.c2 == self.grid.c1 != ":black_circle:" or self.grid.d6 == self.grid.d5 == self.grid.d4 == self.grid.d3 != ":black_circle:" or self.grid.d5 == self.grid.d4 == self.grid.d3 == self.grid.d2 != ":black_circle:" or self.grid.d4 == self.grid.d3 == self.grid.d2 == self.grid.d1 != ":black_circle:" or self.grid.e6 == self.grid.e5 == self.grid.e4 == self.grid.e3 != ":black_circle:" or self.grid.e5 == self.grid.e4 == self.grid.e3 == self.grid.e2 != ":black_circle:" or self.grid.e4 == self.grid.e3 == self.grid.e2 == self.grid.e1 != ":black_circle:" or self.grid.f6 == self.grid.f5 == self.grid.f4 == self.grid.f3 != ":black_circle:" or self.grid.f5 == self.grid.f4 == self.grid.f3 == self.grid.f2 != ":black_circle:" or self.grid.f4 == self.grid.f3 == self.grid.f2 == self.grid.f1 != ":black_circle:" or self.grid.g6 == self.grid.g5 == self.grid.g4 == self.grid.g3 != ":black_circle:" or self.grid.g5 == self.grid.g4 == self.grid.g3 == self.grid.g2 != ":black_circle:" or self.grid.g4 == self.grid.g3 == self.grid.g2 == self.grid.g1 != ":black_circle:":
+        if self.grid.a6 == self.grid.a5 == self.grid.a4 == self.grid.a3 != ":black_circle:" or self.grid.a5 == self.grid.a4 == self.grid.a3 == self.grid.a2 != ":black_circle:" or self.grid.a4 == self.grid.a3 == self.grid.a2 == self.grid.a1 != ":black_circle:" or self.grid.b6 == self.grid.b5 == self.grid.b4 == self.grid.b3 != ":black_circle:" or self.grid.b5 == self.grid.b4 == self.grid.b3 == self.grid.b2 != ":black_circle:" or self.grid.b4 == self.grid.b3 == self.grid.b2 == self.grid.b1 != ":black_circle:" or self.grid.c6 == self.grid.c5 == self.grid.c4 == self.grid.c3 != ":black_circle:" or self.grid.c5 == self.grid.c4 == self.grid.c3 == self.grid.c2 != ":black_circle:" or self.grid.c4 == self.grid.c3 == self.grid.c2 == self.grid.c1 != ":black_circle:" or self.grid.d6 == self.grid.d5 == self.grid.d4 == self.grid.d3 != ":black_circle:" or self.grid.d5 == self.grid.d4 == self.grid.d3 == self.grid.d2 != ":black_circle:" or self.grid.d4 == self.grid.d3 == self.grid.d2 == self.grid.d1 != ":black_circle:" or self.grid.e6 == self.grid.e5 == self.grid.e4 == self.grid.e3 != ":black_circle:" or self.grid.e5 == self.grid.e4 == self.grid.e3 == self.grid.e2 != ":black_circle:" or self.grid.e4 == self.grid.e3 == self.grid.e2 == self.grid.e1 != ":black_circle:" or self.grid.f6 == self.grid.f5 == self.grid.f4 == self.grid.f3 != ":black_circle:" or self.grid.f5 == self.grid.f4 == self.grid.f3 == self.grid.f2 != ":black_circle:" or self.grid.f4 == self.grid.f3 == self.grid.f2 == self.grid.f1 != ":black_circle:" or self.grid.g6 == self.grid.g5 == self.grid.g4 == self.grid.g3 != ":black_circle:" or self.grid.g5 == self.grid.g4 == self.grid.g3 == self.grid.g2 != ":black_circle:" or self.grid.g4 == self.grid.g3 == self.grid.g2 == self.grid.g1 != ":black_circle:":
             return True
-        elif self.grid.a4 == self.grid.b3 == self.grid.c2 == self.grid.d1 != ":black_circle:" or self.grid.b4 == self.grid.c3 == self.grid.d2 == self.grid.e1 != ":black_circle:" or self.grid.c4 == self.grid.d3 == self.grid.e2 == self.grid.f1 != ":black_circle:" or self.grid.d4 == self.grid.e3 == self.grid.f2 == self.grid.g1 != ":black_circle:" or self.grid.g4 == self.grid.f3 == self.grid.e2 == self.grid.d1 != ":black_circle:" or self.grid.f4 == self.grid.e3 == self.grid.d2 == self.grid.c1 != ":black_circle:" or self.grid.e4 == self.grid.d3 == self.grid.c2 == self.grid.b1 != ":black_circle:" or self.grid.d4 == self.grid.c3 == self.grid.b2 == self.grid.a1 != ":black_circle:" or self.grid.a6 == self.grid.b5 == self.grid.c4 == self.grid.d3 != ":black_circle:" or self.grid.b6 == self.grid.c5 == self.grid.d4 == self.grid.e3 != ":black_circle:" or self.grid.c6 == self.grid.d5 == self.grid.e4 == self.grid.f3 != ":black_circle:" or self.grid.d6 == self.grid.e5 == self.grid.f4 == self.grid.g3 != ":black_circle:" or self.grid.g6 == self.grid.f5 == self.grid.e4 == self.grid.d3 != ":black_circle:" or self.grid.f6 == self.grid.e5 == self.grid.d4 == self.grid.c3 != ":black_circle:" or self.grid.e6 == self.grid.d5 == self.grid.c4 == self.grid.b3 != ":black_circle:" or self.grid.d6 == self.grid.c5 == self.grid.b4 == self.grid.a3 != ":black_circle:" or self.grid.a5 == self.grid.b4 == self.grid.c3 == self.grid.d2 != ":black_circle:" or self.grid.b5 == self.grid.c4 == self.grid.d3 == self.grid.e2 != ":black_circle:" or self.grid.c5 == self.grid.d4 == self.grid.e3 == self.grid.f2 != ":black_circle:" or self.grid.d5 == self.grid.e4 == self.grid.f3 == self.grid.g2 != ":black_circle:" or self.grid.g5 == self.grid.f4 == self.grid.e3 == self.grid.d2 != ":black_circle:" or self.grid.f5 == self.grid.e4 == self.grid.d3 == self.grid.c2 != ":black_circle:" or self.grid.e5 == self.grid.d4 == self.grid.c3 == self.grid.b2 != ":black_circle:" or self.grid.d5 == self.grid.c4 == self.grid.b3 == self.grid.a2 != ":black_circle:":
+        if self.grid.a4 == self.grid.b3 == self.grid.c2 == self.grid.d1 != ":black_circle:" or self.grid.b4 == self.grid.c3 == self.grid.d2 == self.grid.e1 != ":black_circle:" or self.grid.c4 == self.grid.d3 == self.grid.e2 == self.grid.f1 != ":black_circle:" or self.grid.d4 == self.grid.e3 == self.grid.f2 == self.grid.g1 != ":black_circle:" or self.grid.g4 == self.grid.f3 == self.grid.e2 == self.grid.d1 != ":black_circle:" or self.grid.f4 == self.grid.e3 == self.grid.d2 == self.grid.c1 != ":black_circle:" or self.grid.e4 == self.grid.d3 == self.grid.c2 == self.grid.b1 != ":black_circle:" or self.grid.d4 == self.grid.c3 == self.grid.b2 == self.grid.a1 != ":black_circle:" or self.grid.a6 == self.grid.b5 == self.grid.c4 == self.grid.d3 != ":black_circle:" or self.grid.b6 == self.grid.c5 == self.grid.d4 == self.grid.e3 != ":black_circle:" or self.grid.c6 == self.grid.d5 == self.grid.e4 == self.grid.f3 != ":black_circle:" or self.grid.d6 == self.grid.e5 == self.grid.f4 == self.grid.g3 != ":black_circle:" or self.grid.g6 == self.grid.f5 == self.grid.e4 == self.grid.d3 != ":black_circle:" or self.grid.f6 == self.grid.e5 == self.grid.d4 == self.grid.c3 != ":black_circle:" or self.grid.e6 == self.grid.d5 == self.grid.c4 == self.grid.b3 != ":black_circle:" or self.grid.d6 == self.grid.c5 == self.grid.b4 == self.grid.a3 != ":black_circle:" or self.grid.a5 == self.grid.b4 == self.grid.c3 == self.grid.d2 != ":black_circle:" or self.grid.b5 == self.grid.c4 == self.grid.d3 == self.grid.e2 != ":black_circle:" or self.grid.c5 == self.grid.d4 == self.grid.e3 == self.grid.f2 != ":black_circle:" or self.grid.d5 == self.grid.e4 == self.grid.f3 == self.grid.g2 != ":black_circle:" or self.grid.g5 == self.grid.f4 == self.grid.e3 == self.grid.d2 != ":black_circle:" or self.grid.f5 == self.grid.e4 == self.grid.d3 == self.grid.c2 != ":black_circle:" or self.grid.e5 == self.grid.d4 == self.grid.c3 == self.grid.b2 != ":black_circle:" or self.grid.d5 == self.grid.c4 == self.grid.b3 == self.grid.a2 != ":black_circle:":
             return True
-        else:
-            return False
+        return False
 
     async def finish_turn(self, mode, reaction):
         if mode == 1:
@@ -299,28 +286,24 @@ class Connect4Session:
                 await self.grid.message.edit(embed=embed)
                 try:
                     await self.grid.message.clear_reactions()
-                except:
-                    pass
+                except discord.Forbidden: pass
                 return await self.end(self.nonturnholder)
             elif ':black_circle:' not in [self.grid.a1, self.grid.b1, self.grid.c1, self.grid.d1, self.grid.e1, self.grid.f1, self.grid.g1]:
                 embed.set_footer(text=embed.Empty)
                 await self.grid.message.edit(embed=embed)
                 try:
                     await self.grid.message.clear_reactions()
-                except:
-                    pass
+                except discord.Forbidden: pass
                 return await self.end()
             await self.grid.message.edit(embed=embed)
             try:
                 await self.grid.message.remove_reaction(reaction, self.nonturnholder)
-            except:
-                pass
+            except discord.Forbidden: pass
             await self.move()
         else:
             try:
                 await self.grid.message.remove_reaction(reaction, self.nonturnholder)
-            except:
-                pass
+            except discord.Forbidden: pass
             await self.channel.send('{}, that column is full! :no_entry:'.format(self.nonturnholder.mention))
             if self.turnholder == self.player1:
                 self.turnholder = self.nonturnholder
@@ -337,7 +320,7 @@ class Connect4Session:
             return user == self.turnholder and str(reaction.emoji) in letters and reaction.message.id == gridmessage.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-        except:
+        except asyncio.TimeoutError:
             if self.active and self.grid.message.id == gridmessage.id:
                 await self.end(self.nonturnholder)
         else:
@@ -505,7 +488,7 @@ class Connect4Session:
                 content = json.load(fp)
                 try:
                     content[str(winner.id)]['wins'] += 1
-                except:
+                except KeyError:
                     content[str(winner.id)] = {}
                     content[str(winner.id)]['wins'] = 1
                     content[str(winner.id)]['losses'] = 0
@@ -519,7 +502,7 @@ class Connect4Session:
                 content = json.load(fp)
                 try:
                     content[str(loser.id)]['losses'] += 1
-                except:
+                except KeyError:
                     content[str(loser.id)] = {}
                     content[str(loser.id)]['losses'] = 1
                     content[str(loser.id)]['wins'] = 0
@@ -533,7 +516,7 @@ class Connect4Session:
                 content = json.load(fp)
                 try:
                     content[str(user.id)]['ties'] += 1
-                except:
+                except KeyError:
                     content[str(user.id)] = {}
                     content[str(user.id)]['ties'] = 1
                     content[str(user.id)]['wins'] = 0
@@ -545,13 +528,12 @@ class Connect4Session:
         self.active = False
         try:
             await self.grid.message.clear_reactions()
-        except:
-            pass
+        except discord.Forbidden: pass
         try:
             embed = self.grid.message.embeds[0]
             embed.set_footer(text=embed.Empty)
             await self.grid.message.edit(embed=embed)
-        except: pass
+        except discord.NotFound: pass
         embed = discord.Embed(color=0x00bdff, title='Connect 4', description='Match ending...')
         if winner is None:
             winner = None
@@ -585,7 +567,7 @@ class Connect4Session:
         embed.set_footer(text="The grid will appear in 10 seconds... | Game ID: {}".format(self.gameid))
         await self.channel.send(embed=embed)
         if not ctx.channel.permissions_for(ctx.me).manage_messages:
-                await ctx.send(':warning: Heads up! I don\'t have manage messages permission, so you\'ll have to remove your reactions yourself.')
+            await ctx.send(':warning: Heads up! I don\'t have manage messages permission, so you\'ll have to remove your reactions yourself.')
         await asyncio.sleep(10)
         if self.active:
             await self.grid.display()
@@ -594,7 +576,6 @@ def get_connect4_session(ctx):
     for session in sessions:
         if session.channel == ctx.channel and session.active is True:
             return session
-        pass
 
 def connect4_active(ctx):
     for session in sessions:
@@ -627,8 +608,8 @@ async def on_member_join(member):
         return
     await update_server_roles(member.id)
 
-@client.command(aliases=['commands'])
-async def help(ctx):
+@client.command(name='help', aliases=['commands'])
+async def help_command(ctx):
     user = ctx.author
     if check_blacklist(user):
         return
@@ -646,7 +627,7 @@ async def help(ctx):
     try:
         await user.send(embed=embed)
         await ctx.send('{}, check your DMs.'.format(user.mention))
-    except:
+    except discord.Forbidden:
         await ctx.send('{}, I couldn\'t send you a DM.'.format(user.mention))
 
 @client.command()
@@ -661,7 +642,7 @@ async def info(ctx):
     embed.add_field(name='How can I donate to Connect 4 Bot?', value='We accept donatons on our [Patreon](https://patreon.com/bladebot). Please note that the link will direct to Blade bot. We are the same developers.')
     try:
         await ctx.send(embed=embed)
-    except:
+    except discord.Forbidden:
         return await ctx.send('{}, I do not have permission to send this command output. :no_entry:'.format(ctx.author.mention))
 
 @client.command()
@@ -741,7 +722,6 @@ async def shutdown(ctx, mode, force=False):
         await ctx.send('{}, restarting... :white_check_mark:'.format(user.mention))
         os.system('bot.py')
         await client.logout()
-        
     elif mode == '-u':
         message = await ctx.send('{}, updating... :cd:'.format(user.mention))
         os.system('git pull')
@@ -771,7 +751,7 @@ async def debug(ctx, *, code):
             result = eval(code, global_vars, locals())
         except Exception as e:
             await ctx.send(box('{}: {}'.format(type(e).__name__, str(e)),
-                                   lang='py'))
+                               lang='py'))
             return
 
         if asyncio.iscoroutine(result):
@@ -785,7 +765,7 @@ async def debug(ctx, *, code):
 
 @client.command()
 @commands.cooldown(1, 20, commands.BucketType.user)
-async def report(ctx, user: discord.Member=None, *, reason=None):
+async def report(ctx, user: discord.Member = None, *, reason = None):
     reporter = ctx.author
     if check_blacklist(reporter):
         return
@@ -796,7 +776,7 @@ async def report(ctx, user: discord.Member=None, *, reason=None):
         return await ctx.send(embed=embed)
     try:
         guild = reporter.guild
-    except:
+    except AttributeError:
         return await ctx.send('{}, please use the report command in a server. :no_entry:'.format(reporter.mention))
     if user.id == reporter.id:
         return await ctx.send('{}, the report command is meant for serious inquiries only. :no_entry:'.format(reporter.mention))
@@ -809,7 +789,7 @@ async def report(ctx, user: discord.Member=None, *, reason=None):
     try:
         if rbl[str(reporter.id)] == 1:
             return await ctx.send('{}, you\'re not allowed to send reports. :no_entry:'.format(reporter.mention))
-    except: pass
+    except KeyError: pass
     embed = discord.Embed(color=0xe02828, title="New Report", timestamp=timestamp)
     embed.add_field(name="Reporter", value='{} `{}`'.format(reporter, reporter.id))
     embed.add_field(name="User", value='{} `{}`'.format(user, user.id))
@@ -828,7 +808,7 @@ async def play(ctx):
             return str(reaction.emoji) == '🤝' and user != ctx.me and user != author and not already_playing(user) and not user.bot and reaction.message.id == message.id and not check_blacklist(user)
         try:
             reaction = await client.wait_for('reaction_add', timeout=30.0, check=check)
-        except:
+        except asyncio.TimeoutError:
             session.active = False
             await ctx.send('{}, unfortunately, no one has joined your game. :no_entry:'.format(author.mention))
             await message.delete()
@@ -837,7 +817,7 @@ async def play(ctx):
             session.nonturnholder = session.player2
             await message.delete()
             await session.start(ctx)
-        
+
     if not ctx.guild:
         return await ctx.send('{}, you may not start a game in DMs. :no_entry:'.format(author.mention))
     if connect4_active(ctx):
@@ -851,8 +831,9 @@ async def play(ctx):
     await message.add_reaction("🤝")
     await wait_player_two(session)
 
-@client.command()
-async def quit(ctx):
+@client.command(name='quit')
+async def quit_command(ctx):
+    """Quit Command. Quit the current Connect 4 game."""
     author = ctx.author
     if check_blacklist(author):
         return
@@ -869,6 +850,7 @@ async def quit(ctx):
 
 @client.command(aliases=['display'])
 async def view(ctx):
+    """View Command. Sends the grid and deletes the old grid."""
     author = ctx.author
     if check_blacklist(author):
         return
@@ -882,7 +864,8 @@ async def view(ctx):
     return await session.grid.display()
 
 @client.command()
-async def stats(ctx, *, user: discord.Member=None):
+async def stats(ctx, *, user: discord.Member = None):
+    """Stats Command. Shows a user's Connect 4 stats."""
     author = ctx.author
     if check_blacklist(author):
         return
@@ -901,7 +884,7 @@ async def stats(ctx, *, user: discord.Member=None):
             rank = get_rank(user.id)
             if points < 0:
                 points = 0
-        except:
+        except KeyError:
             wins = losses = draws = total = points = 0
             avgwins = 0.00
             rank = 'Learner'
@@ -915,6 +898,7 @@ async def stats(ctx, *, user: discord.Member=None):
 
 @client.command()
 async def game(ctx, gameid=None, gridmode=None):
+    """Game Command. Shows info about past games."""
     user = ctx.author
     if check_blacklist(user):
         return
@@ -924,11 +908,10 @@ async def game(ctx, gameid=None, gridmode=None):
     content = json.load(fp)
     try:
         game = content[str(gameid)]
-    except:
+    except KeyError:
         return await ctx.send('{}, that\'s not a valid game ID. :no_entry:'.format(user.mention))
     if gridmode == 'grid':
-        async with ctx.typing():
-            pass
+        async with ctx.typing(): pass
         player1 = client.get_user(game['player1'])
         player2 = client.get_user(game['player2'])
         if player1 is None:
@@ -939,8 +922,7 @@ async def game(ctx, gameid=None, gridmode=None):
         embed.add_field(name=":regional_indicator_a:​:regional_indicator_b:​:regional_indicator_c:​:regional_indicator_d:​:regional_indicator_e:​:regional_indicator_f:​:regional_indicator_g:", value="{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}\n{}{}{}{}{}{}{}".format(game['grid']['a1'], game['grid']['b1'], game['grid']['c1'], game['grid']['d1'], game['grid']['e1'], game['grid']['f1'], game['grid']['g1'], game['grid']['a2'], game['grid']['b2'], game['grid']['c2'], game['grid']['d2'], game['grid']['e2'], game['grid']['f2'], game['grid']['g2'], game['grid']['a3'], game['grid']['b3'], game['grid']['c3'], game['grid']['d3'], game['grid']['e3'], game['grid']['f3'], game['grid']['g3'], game['grid']['a4'], game['grid']['b4'], game['grid']['c4'], game['grid']['d4'], game['grid']['e4'], game['grid']['f4'], game['grid']['g4'], game['grid']['a5'], game['grid']['b5'], game['grid']['c5'], game['grid']['d5'], game['grid']['e5'], game['grid']['f5'], game['grid']['g5'], game['grid']['a6'], game['grid']['b6'], game['grid']['c6'], game['grid']['d6'], game['grid']['e6'], game['grid']['f6'], game['grid']['g6']), inline=False)
         return await ctx.send(embed=embed)
     embed = discord.Embed(color=0x3498db, title='Game No. {}'.format(gameid))
-    async with ctx.typing():
-        pass
+    async with ctx.typing(): pass
     winner = client.get_user(game['winner'])
     if winner is None:
         winner = await client.get_user_info(game['winner'])
@@ -974,6 +956,7 @@ async def game(ctx, gameid=None, gridmode=None):
 
 @report.error
 async def report_error(ctx, error):
+    """Error handler for the report command."""
     user = ctx.author
     if isinstance(error, commands.CommandOnCooldown):
         return await ctx.send('{}, please try again in **{}**. :no_entry:'.format(user.mention, display_time(error.retry_after)))
