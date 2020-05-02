@@ -1,8 +1,3 @@
-'''
-This was stolen from somewhere but I forgot where, email me if you want your credits
-william@williamlomas.me
-'''
-
 def error(text):
     return "\N{NO ENTRY SIGN} {}".format(text)
 
