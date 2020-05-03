@@ -1,0 +1,16 @@
+{
+    "bottoken": "",
+    "prefixes": [],
+    "ownerid": "",
+    "mainguildid": "",
+    "reportchannelid": "",
+    "rankroles": {
+        "Learner": "",
+        "Average": "",
+        "Pro": "",
+        "Master": "",
+        "God": "",
+        "Legend": "",
+        "Dominator": ""
+    }
+}

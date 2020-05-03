@@ -25,13 +25,22 @@ SOFTWARE.
 import asyncio
 import json
 import os
-import datetime
+from datetime import datetime
 import discord
 from discord.ext import commands
 from utils.chat_formatting import pagify, box
 
-prefixes = ['<@442185653992816640> ', '<@!442185653992816640> ', 'c4-', 'C4-']
-client = commands.Bot(command_prefix=prefixes)
+class Config:
+    with open('config.json') as fp:
+        c = json.load(fp)
+        t = c['bottoken']
+        pfxs = c['prefixes']
+        oid = c['ownerid']
+        mgid = c['mainguildid']
+        rc = c['reportchannelid']
+        rs = c['rankroles']
+
+client = commands.Bot(command_prefix=Config.pfxs)
 client.remove_command('help')
 sessions = []
 rankslist = {
@@ -84,11 +93,11 @@ def get_rank(userid):
         return 'Learner'
 
 async def update_server_roles(userid):
-    server = client.get_guild(442186373089198080)
+    server = client.get_guild(Config.mgid)
     user = discord.utils.get(server.members, id=userid)
     if user is None:
         return
-    roles = [discord.utils.get(server.roles, id=442626469597020192), discord.utils.get(server.roles, id=442626468154048514), discord.utils.get(server.roles, id=442626465767489537), discord.utils.get(server.roles, id=442626463380799488), discord.utils.get(server.roles, id=442626453931032577), discord.utils.get(server.roles, id=442626446742257675), discord.utils.get(server.roles, id=442626725604753408)]
+    roles = [discord.utils.get(server.roles, id=Config.rs["Learner"]), discord.utils.get(server.roles, id=Config.rs["Average"]), discord.utils.get(server.roles, id=Config.rs["Pro"]), discord.utils.get(server.roles, id=Config.rs["Master"]), discord.utils.get(server.roles, id=Config.rs["God"]), discord.utils.get(server.roles, id=Config.rs["Legend"]), discord.utils.get(server.roles, id=Config.rs["Dominator"])]
     rank = get_rank(userid)
     if rank == 'Learner':
         for useri in roles[0].members:
@@ -142,9 +151,9 @@ def check_blacklist(user):
 
 async def status_rotation():
     while True:
-        await client.change_presence(activity=discord.Game(name="Connect 4 | c4-help"))
+        await client.change_presence(activity=discord.Game(name=f"Connect 4 | {Config.pfxs[0]}help"))
         await asyncio.sleep(30)
-        await client.change_presence(activity=discord.Activity(name="your moves 👀 | c4-help", type=discord.ActivityType.watching))
+        await client.change_presence(activity=discord.Activity(name=f"you play 👀 | {Config.pfxs[0]}help", type=discord.ActivityType.watching))
         await asyncio.sleep(30)
 
 def count_active_games():
@@ -550,10 +559,10 @@ class Connect4Session:
             embed.add_field(name='Loser', value='{} (:red_circle:)'.format(self.player1))
             storewindata(winner)
             storelossdata(self.player1)
-        embed.set_footer(text='You can check your Connect 4 stats using c4-stats.')
+        embed.set_footer(text=f'You can check your Connect 4 stats using {Config.pfxs[0]}stats.')
         embed.add_field(name='Enjoyed this minigame?', value='If so, please consider donating by [clicking here](https://patreon.com/bladebot) to help keep Connect 4 bot alive, and so we may continue further development.')
         await self.channel.send(embed=embed)
-        self.timestamp = datetime.datetime.now()
+        self.timestamp = datetime.now()
         self.save_data(winner)
         await update_server_roles(self.player1.id)
         await update_server_roles(self.player2.id)
@@ -562,7 +571,7 @@ class Connect4Session:
         self.gameid = get_game_id()
         embed = discord.Embed(color=0x00bdff, title='Connect 4', description='Match starting')
         embed.add_field(name='Players', value='{} (:red_circle:)\nvs.\n{} (:large_blue_circle:)'.format(self.player1, self.player2))
-        embed.add_field(name='How to Play?', value='Basic Connect 4 rules.\nSimply react with the column you\'d like to place your tile under.\nIf you want the bot to send the grid again, run `c4-view`\nTo quit, use `c4-quit`\nYou have 60 seconds between each turn, be careful not to let it run out.')
+        embed.add_field(name='How to Play?', value=f'Basic Connect 4 rules.\nSimply react with the column you\'d like to place your tile under.\nIf you want the bot to send the grid again, run `{ctx.prefix}view`\nTo quit, use `{ctx.prefix}quit`\nYou have 60 seconds between each turn, be careful not to let it run out.')
         embed.add_field(name='Goodluck', value='May the best win!')
         embed.set_footer(text="The grid will appear in 10 seconds... | Game ID: {}".format(self.gameid))
         await self.channel.send(embed=embed)
@@ -604,7 +613,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    if member.guild.id != 442186373089198080:
+    if member.guild.id != Config.mgid:
         return
     await update_server_roles(member.id)
 
@@ -614,16 +623,16 @@ async def help_command(ctx):
     if check_blacklist(user):
         return
     embed = discord.Embed(color=0x3498db, title='Connect 4 Bot Help', description='The command list')
-    embed.add_field(name='c4-help', value='View this menu.', inline=False)
-    embed.add_field(name='c4-info', value='View info about Connect 4 Bot.', inline=False)
-    embed.add_field(name='c4-invite', value='Invite Connect 4 Bot.', inline=False)
-    embed.add_field(name='c4-ranks', value='View the list of ranks.', inline=False)
-    embed.add_field(name='c4-report', value='Report a user for breaking a rule.', inline=False)
-    embed.add_field(name='c4-play', value='Request for a game of Connect 4.', inline=False)
-    embed.add_field(name='c4-view', value='Reload the grid.', inline=False)
-    embed.add_field(name='c4-quit', value='Surrender your current game.', inline=False)
-    embed.add_field(name='c4-game', value='View info on a previous game.', inline=False)
-    embed.add_field(name='c4-stats', value='See your own, or someone else\'s Connect 4 stats', inline=False)
+    embed.add_field(name=f'{ctx.prefix}help', value='View this menu.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}info', value='View info about Connect 4 Bot.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}invite', value='Invite Connect 4 Bot.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}ranks', value='View the list of ranks.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}report', value='Report a user for breaking a rule.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}play', value='Request for a game of Connect 4.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}view', value='Reload the grid.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}quit', value='Surrender your current game.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}game', value='View info on a previous game.', inline=False)
+    embed.add_field(name=f'{ctx.prefix}stats', value='See your own, or someone else\'s Connect 4 stats', inline=False)
     try:
         await user.send(embed=embed)
         await ctx.send('{}, check your DMs.'.format(user.mention))
@@ -636,10 +645,8 @@ async def info(ctx):
         return
     embed = discord.Embed(color=0x3498db)
     embed.add_field(name='What is Connect 4 Bot?', value='Connect 4 bot is a bot designed specifically for the gameplay of Connect 4, in Discord!')
-    embed.add_field(name='Who made Connect 4 Bot?', value='Connect 4 bot is made by William L. His Discord tag is Mippy#0001.')
-    embed.add_field(name='How did Connect 4 Bot come to be?', value='William works on a bot called Blade with his good friend Alexis. On their bot, they perfected the Discord Connect 4 experience. Now, they\'ve made a completely separate bot for Connect 4 altogether!')
-    embed.add_field(name='How do I use Connect 4 Bot?', value='Simply type `c4-help` to get the list of commands.')
-    embed.add_field(name='How can I donate to Connect 4 Bot?', value='We accept donatons on our [Patreon](https://patreon.com/bladebot). Please note that the link will direct to Blade bot. We are the same developers.')
+    embed.add_field(name='Who made Connect 4 Bot?', value='Connect 4 bot is made by Isabel L. Her Discord tag is Isabel#7551.')
+    embed.add_field(name='How do I use Connect 4 Bot?', value=f'Simply type `{ctx.prefix}help` to get the list of commands.')
     try:
         await ctx.send(embed=embed)
     except discord.Forbidden:
@@ -649,7 +656,7 @@ async def info(ctx):
 async def invite(ctx):
     if check_blacklist(ctx.author):
         return
-    embed = discord.Embed(color=0x3498db, description='**Thanks for your interest in Connect 4 Bot!**\n[C4 Bot Link](https://discordapp.com/oauth2/authorize?client_id=442185653992816640&permissions=288832&redirect_uri=https%3A%2F%2Fwilliamlomas.me%2Fthanks&scope=bot)\n[Support Server Invite](https://discord.gg/wzWpsfU)')
+    embed = discord.Embed(color=0x3498db, description=f'**Thanks for your interest in Connect 4 Bot!**\n[C4 Bot Link](https://discordapp.com/oauth2/authorize?client_id={client.user.id}&permissions=288832')
     await ctx.send(embed=embed)
 
 @client.command()
@@ -692,7 +699,7 @@ async def ranks(ctx):
 @client.command()
 async def blacklist(ctx, mode, userid):
     user = ctx.author
-    if user.id != 169275259026014208:
+    if user.id != Config.oid:
         return
     fp = open('data/blacklist.data', 'r+')
     content = json.load(fp)
@@ -709,7 +716,7 @@ async def blacklist(ctx, mode, userid):
 @client.command()
 async def shutdown(ctx, mode, force=False):
     user = ctx.author
-    if user.id != 169275259026014208:
+    if user.id != Config.oid:
         return
     if not force:
         games = count_active_games()
@@ -733,7 +740,7 @@ async def shutdown(ctx, mode, force=False):
 
 @client.command()
 async def debug(ctx, *, code):
-    if ctx.author.id != 169275259026014208:
+    if ctx.author.id != Config.oid:
         return
     try:
         code = code.strip('` ')
@@ -770,8 +777,8 @@ async def report(ctx, user: discord.Member = None, *, reason = None):
     if check_blacklist(reporter):
         return
     if user is None or reason is None:
-        embed = discord.Embed(color=0x3498db, description='Command Help', title='c4-report')
-        embed.add_field(name='c4-report <user> <reason>', value='Report a rule-breaker.', inline=False)
+        embed = discord.Embed(color=0x3498db, description='Command Help', title=f'{ctx.prefix}report')
+        embed.add_field(name=f'{ctx.prefix}report <user> <reason>', value='Report a rule-breaker.', inline=False)
         embed.add_field(name='About Reporting:', value='Reporting users is taken seriously, please do not send joke reports or you may find yourself revoked of privileges.\n\nWhen reporting, include as much detail as possible, including Game IDs.\nTo get a Game ID, you\'ll see it in the footer of the \'Match Starting\' screen.', inline=False)
         return await ctx.send(embed=embed)
     try:
@@ -782,8 +789,8 @@ async def report(ctx, user: discord.Member = None, *, reason = None):
         return await ctx.send('{}, the report command is meant for serious inquiries only. :no_entry:'.format(reporter.mention))
     if user.id == client.user.id:
         return await ctx.send('{}, the report command is meant for serious inquiries only. :no_entry:'.format(reporter.mention))
-    timestamp = datetime.datetime.now()
-    channel = client.get_channel(442239818001416194)
+    timestamp = datetime.now()
+    channel = client.get_channel(Config.rc)
     rbl = open('data/blacklist.data')
     rbl = json.load(rbl)
     try:
@@ -945,13 +952,13 @@ async def game(ctx, gameid=None, gridmode=None):
     else:
         channelname = channel.name
         guild = channel.guild.name
-    timestamp = datetime.datetime.strptime(game['timestamp'], '%Y-%m-%d %H:%M:%S.%f')
+    timestamp = datetime.strptime(game['timestamp'], '%Y-%m-%d %H:%M:%S.%f')
     embed.timestamp = timestamp
     embed.add_field(name='Winner', value=winner)
     embed.add_field(name='Loser', value=loser)
     embed.add_field(name='Channel', value='#' + channelname)
     embed.add_field(name='Server', value=guild)
-    embed.add_field(name='Grid', value='Run the command `c4-game {} grid` to view this game\'s grid.'.format(gameid))
+    embed.add_field(name='Grid', value='Run the command `{}game {} grid` to view this game\'s grid.'.format(ctx.prefix, gameid))
     await ctx.send(embed=embed)
 
 @report.error
@@ -961,5 +968,4 @@ async def report_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         return await ctx.send('{}, please try again in **{}**. :no_entry:'.format(user.mention, display_time(error.retry_after)))
 
-token = open('token')
-client.run(token.read())
+client.run(Config.t)
